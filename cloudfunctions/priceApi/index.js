@@ -1,4 +1,5 @@
 const deployment=require("./deployment.json");
+const {locationPattern}=require('./location-match');
 const {buildUserAnalysis}=require('./user-analysis');
 const cloud=require('wx-server-sdk');
 const {randomUUID,createHash}=require('crypto');
@@ -29,8 +30,10 @@ exports.main=async(event)=>{
  if(route.pathname==='/api/mine'&&method==='GET')return {count:(await posts.where({owner:OPENID}).count()).total};
  if(route.pathname==='/api/posts'&&method==='GET'){
  const city=text(route.searchParams.get('city'),'城市'),name=(route.searchParams.get('name')||'').trim();
- const filter={city,cityVisible:true};if(name)filter.name=db.RegExp({regexp:text(name,'名称').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),options:'i'});
- return {posts:await images((await posts.where(filter).orderBy('createdAt','desc').limit(100).get()).data.map(clean))};
+ const location=db.RegExp({regexp:locationPattern(city),options:'i'});const common={city:location};if(name)common.name=db.RegExp({regexp:text(name,'名称').replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),options:'i'});
+ const [published,mine]=await Promise.all([posts.where({...common,cityVisible:true}).orderBy('createdAt','desc').limit(100).get(),posts.where({...common,owner:OPENID}).orderBy('createdAt','desc').limit(50).get()]);
+ const combined=[...new Map([...published.data,...mine.data].map(q=>[q._id,q])).values()].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
+ return {posts:await images(combined.map(q=>({...clean(q),isOwn:q.owner===OPENID,cityVisible:q.cityVisible===true})))};
  }
  if(route.pathname==='/api/posts'&&method==='POST'){
  const input=quoteInput(body),image=decodeImage(body),id=randomUUID();let fileID='';

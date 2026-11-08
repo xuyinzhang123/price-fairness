@@ -1,0 +1,3 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const {locationMatches}=require('../miniprogram/utils/location-match');
+test('county search matches plain, suffix and city-prefixed variants',()=>{for(const q of ['台前','台前县','濮阳·台前县'])assert.equal(locationMatches('濮阳·台前县',q),true);assert.equal(locationMatches('台前县','台前'),true);assert.equal(locationMatches('湖州·德清县','湖州'),true);assert.equal(locationMatches('湖州','湖州市'),true);assert.equal(locationMatches('濮阳·范县','台前'),false)});
+test('location input cannot inject a regular expression',()=>{assert.equal(locationMatches('台前县','.*'),false)});

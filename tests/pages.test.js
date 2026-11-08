@@ -4,7 +4,7 @@ function page(name,api,store,wx={}){
  let instance;
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,"../miniprogram/pages",name,"index.js"),"utf8"),{
   Page(p){instance=p;p.setData=function(patch){Object.assign(this.data,patch)}},
-  require(id){if(id.endsWith("/location-suggestions"))return require("../miniprogram/utils/location-suggestions");if(id.endsWith("/poster"))return require("../miniprogram/utils/poster");if(id.endsWith("/api"))return api;if(id.endsWith("/store"))return store;throw new Error(id)},
+  require(id){if(id.endsWith("/location-match"))return require("../miniprogram/utils/location-match");if(id.endsWith("/location-suggestions"))return require("../miniprogram/utils/location-suggestions");if(id.endsWith("/poster"))return require("../miniprogram/utils/poster");if(id.endsWith("/api"))return api;if(id.endsWith("/store"))return store;throw new Error(id)},
   wx,clearTimeout
  });
  return instance;

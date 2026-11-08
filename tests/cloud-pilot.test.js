@@ -11,7 +11,7 @@ test('cloud pilot saves hotel, searches public records and attaches replies',asy
  const {call,data}=handler();const a=(await call({path:'/api/posts',data:{...quote,cityVisible:true}})).post;
  await call({path:'/api/posts',data:quote});await call({path:'/api/posts',data:{...quote,city:'上海',cityVisible:true}});
  assert.equal(a.owner,undefined);assert.equal(data.price_posts.size,3);
- const found=await call({path:'/api/posts?city=成都&name=酒店',method:'GET'});assert.equal(found.posts.length,1);
+ const found=await call({path:'/api/posts?city=成都&name=酒店',method:'GET'});assert.equal(found.posts.length,2);assert.ok(found.posts.some(p=>p.isOwn&&!p.cityVisible));
  assert.equal((await call({path:'/api/posts?city=成都&name=.*',method:'GET'})).posts.length,0);
  await call({path:'/api/posts/'+a.id+'/replies',data:{...quote,price:288}});
  assert.equal((await call({path:'/api/posts/'+a.id,method:'GET'})).post.replies[0].price,288);
@@ -35,4 +35,10 @@ test('cloud analysis reads public posts and replies but excludes private thread 
  data.price_posts.set('private',{_id:'private',owner:'hidden',name:'蛋炒饭',city:'湖州',price:1,priceType:'paid',scene:'',observedAt:now,createdAt:now,cityVisible:false});
  data.price_replies.set('private-reply',{_id:'private-reply',postId:'private',owner:'hidden-reply',name:'蛋炒饭',city:'湖州',price:1,priceType:'paid',scene:'',observedAt:now});
  const a=await call({path:'/api/analyze',data:{name:'蛋炒饭',city:'湖州',price:28,priceType:'paid'}});assert.equal(a.status,'ready');assert.equal(a.score,100);assert.equal(a.title,'大冤种');assert.equal(a.count,5);assert.equal(a.references.some(r=>r.id==='private-reply'),false);
+});
+
+test('county search finds owner private post but never another users unlisted post',async()=>{
+ const {call,data}=handler();const common={name:'干切牛肉',city:'濮阳·台前县',price:40,priceType:'paid',scene:'',createdAt:new Date().toISOString(),observedAt:new Date().toISOString()};
+ data.price_posts.set('own',{...common,_id:'own',owner:'user-a',cityVisible:false});data.price_posts.set('hidden',{...common,_id:'hidden',owner:'someone-else',cityVisible:false});data.price_posts.set('public',{...common,_id:'public',owner:'someone-else',cityVisible:true});
+ for(const city of ['台前','台前县','濮阳·台前县']){const result=await call({path:'/api/posts?city='+encodeURIComponent(city)+'&name='+encodeURIComponent('干切牛肉'),method:'GET'});assert.deepEqual(new Set(result.posts.map(p=>p.id)),new Set(['own','public']));}
 });

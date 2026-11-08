@@ -1,3 +1,4 @@
+const {locationMatches}=require("../../utils/location-match");
 const {suggestLocations}=require("../../utils/location-suggestions");
 const store=require("../../utils/store");const api=require("../../utils/api");
 Page({data:{citySuggestions:[],citySuggestionsOpen:false,region:[],items:[],cloud:false,error:"",city:"",name:"",loading:false,searched:false},
@@ -14,7 +15,7 @@ async search(){
  this.setData({cloud:api.enabled(),error:"",city,name,items:[],loading:!!city,searched:!!city});
  if(!city)return;
  try{
- const items=api.enabled()?(await api.request("/api/posts?city="+encodeURIComponent(city)+"&name="+encodeURIComponent(name),undefined,"GET")).posts.map(p=>({...p,image:api.imageUrl(p.image)})):store.read().filter(p=>!p.parentId&&p.cityVisible===true&&p.city===city&&(!name||p.name.includes(name)));
+ const items=api.enabled()?(await api.request("/api/posts?city="+encodeURIComponent(city)+"&name="+encodeURIComponent(name),undefined,"GET")).posts.map(p=>({...p,image:api.imageUrl(p.image)})):store.read().filter(p=>!p.parentId&&(p.cityVisible===true||p.source==="user")&&locationMatches(p.city,city)&&(!name||p.name.includes(name)));
  if(this.requestId===requestId)this.setData({items,loading:false});
  }catch(e){if(this.requestId===requestId)this.setData({error:e.message,items:[],loading:false})}
 },
