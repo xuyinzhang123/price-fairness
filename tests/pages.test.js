@@ -4,8 +4,8 @@ function page(name,api,store,wx={}){
  let instance;
  vm.runInNewContext(fs.readFileSync(path.join(__dirname,"../miniprogram/pages",name,"index.js"),"utf8"),{
   Page(p){instance=p;p.setData=function(patch){Object.assign(this.data,patch)}},
-  require(id){if(id.endsWith("/poster"))return require("../miniprogram/utils/poster");if(id.endsWith("/api"))return api;if(id.endsWith("/store"))return store;throw new Error(id)},
-  wx
+  require(id){if(id.endsWith("/location-suggestions"))return require("../miniprogram/utils/location-suggestions");if(id.endsWith("/poster"))return require("../miniprogram/utils/poster");if(id.endsWith("/api"))return api;if(id.endsWith("/store"))return store;throw new Error(id)},
+  wx,clearTimeout
  });
  return instance;
 }
@@ -127,4 +127,11 @@ test('city selector normalizes ordinary cities and municipalities and remembers 
   const p=page(name,{}, {},wx);p.cityChange({detail:{value:['浙江省','湖州市','吴兴区']}});assert.equal(p.data.city,'湖州');assert.equal(saved['price-fairness-city'],'湖州');
   p.cityChange({detail:{value:['上海市','市辖区','黄浦区']}});assert.equal(p.data.city,'上海');
  }
+});
+
+test("native location input accepts custom county and applies a suggestion",()=>{
+ const p=page("community",{enabled:()=>false},{read:()=>[]},{setStorageSync(){}});
+ p.cityInput({detail:{value:"德清"}});assert.equal(p.data.city,"德清");assert.ok(p.data.citySuggestions.some(r=>r.value==="湖州·德清县"));
+ p.cityInput({detail:{value:"我自己填写的地方"}});assert.equal(p.data.city,"我自己填写的地方");assert.equal(p.data.citySuggestions.length,0);
+ p.cityPick({currentTarget:{dataset:{value:"湖州·德清县"}}});assert.equal(p.data.city,"湖州·德清县");assert.equal(p.data.citySuggestionsOpen,false);
 });

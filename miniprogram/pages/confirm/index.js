@@ -1,5 +1,6 @@
+const {suggestLocations}=require("../../utils/location-suggestions");
 const api=require("../../utils/api");
-Page({data:{region:[],showPlace:false,placeName:"",locationHint:"",scene:"",scenes:["地摊","街边店","商场","景区","其他"],image:"",name:"",price:"",city:"",paid:true,recognition:"manual"},
+Page({data:{citySuggestions:[],citySuggestionsOpen:false,region:[],showPlace:false,placeName:"",locationHint:"",scene:"",scenes:["地摊","街边店","商场","景区","其他"],image:"",name:"",price:"",city:"",paid:true,recognition:"manual"},
 async onLoad(q){
  this.setData({image:q.image?decodeURIComponent(q.image):"",city:wx.getStorageSync("price-fairness-city")||""});
  if(!this.data.image||!api.enabled())return;
@@ -13,6 +14,11 @@ async onLoad(q){
 },
 noop(){},closePlace(){this.setData({showPlace:false})},togglePlace(){this.setData({showPlace:!this.data.showPlace})},sceneChange(e){const value=e.currentTarget.dataset.scene;this.setData({scene:this.data.scene===value?"":value})},
 change(e){this.setData({[e.currentTarget.dataset.field]:e.detail.value})},
+cityInput(e){this.cityChange(e);this.setData({citySuggestions:suggestLocations(e.detail.value),citySuggestionsOpen:true})},
+cityFocus(){clearTimeout(this.cityCloseTimer);this.setData({citySuggestions:suggestLocations(this.data.city),citySuggestionsOpen:true})},
+cityBlur(){this.cityCloseTimer=setTimeout(()=>this.setData({citySuggestionsOpen:false}),200)},
+cityPick(e){clearTimeout(this.cityCloseTimer);this.cityChange({detail:{value:e.currentTarget.dataset.value}});this.setData({citySuggestionsOpen:false})},
+cityConfirm(){this.setData({citySuggestionsOpen:false});},
 cityChange(e){const value=e.detail.value;const region=Array.isArray(value)?value:[];let city=region.length?(region[1]==="市辖区"||region[1]==="县"?region[0]:region[1]):value;city=city||"";if(!city.includes("·"))city=city.replace(/市$/,"");this.setData({city,region});wx.setStorageSync("price-fairness-city",city)},
 paidChange(e){this.setData({paid:e.detail.value})},
 submit(){const d=this.data;const price=Number(d.price);
