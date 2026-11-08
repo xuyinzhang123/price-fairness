@@ -28,7 +28,8 @@ poster(){
 onShareAppMessage(){
  const p=this.data.post;
  if(!api.enabled()||!p)return {title:"这价格，冤不冤？",path:"/pages/camera/index"};
- return {title:p.name+"花了 ¥"+p.price+"，我冤不冤？来评评理",
+ const feeling=p.mood==="won"?"感觉赚大了，你们那边多少钱？":p.mood==="ripped"?"我是不是大冤种？":"我冤不冤？来评评理";
+ return {title:p.name+"花了 ¥"+p.price+"，"+feeling,
   path:"/pages/detail/index?id="+encodeURIComponent(this.id),
   ...(p.image?{imageUrl:p.image}:{})};
 },

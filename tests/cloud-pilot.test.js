@@ -42,3 +42,5 @@ test('county search finds owner private post but never another users unlisted po
  data.price_posts.set('own',{...common,_id:'own',owner:'user-a',cityVisible:false});data.price_posts.set('hidden',{...common,_id:'hidden',owner:'someone-else',cityVisible:false});data.price_posts.set('public',{...common,_id:'public',owner:'someone-else',cityVisible:true});
  for(const city of ['台前','台前县','濮阳·台前县']){const result=await call({path:'/api/posts?city='+encodeURIComponent(city)+'&name='+encodeURIComponent('干切牛肉'),method:'GET'});assert.deepEqual(new Set(result.posts.map(p=>p.id)),new Set(['own','public']));}
 });
+
+test('published feeling persists independently from price analysis',async()=>{const {call}=handler();const result=await call({path:'/api/posts',data:{...quote,mood:'won'}});assert.equal(result.post.mood,'won');assert.equal((await call({path:'/api/posts/'+result.post.id,method:'GET'})).post.mood,'won');assert.ok((await call({path:'/api/posts',data:{...quote,mood:'forged-score'}})).error)});

@@ -5,7 +5,8 @@ Page({data:{draft:{},count:0,published:false,busy:false,analysis:null,error:"",c
  preview:"",cardBusy:true,cardError:"",showReferences:false,showOptions:false,saving:false,publishing:false},
 onLoad(){this.setData({cloud:api.enabled()})},
 onShow(){
- const draft=wx.getStorageSync("price-fairness-draft");
+ const saved=wx.getStorageSync("price-fairness-draft");
+ const draft=saved?{...saved,mood:saved.mood||"neutral"}:null;
  if(!draft){wx.switchTab({url:"/pages/camera/index"});return}
  this.setData({draft});this.analyze();
 },
@@ -45,6 +46,7 @@ async renderCard(){
 noop(){},closeSheet(){this.setData({showReferences:false,showOptions:false})},
 toggleReferences(){this.setData({showReferences:!this.data.showReferences,showOptions:false})},
 toggleOptions(){this.setData({showOptions:!this.data.showOptions,showReferences:false})},
+moodChange(e){const mood=e.currentTarget.dataset.mood;if(!["neutral","won","ripped"].includes(mood)||this.data.published)return;const draft={...this.data.draft,mood};this.setData({draft});wx.setStorageSync("price-fairness-draft",draft);this.renderCard()},
 visibilityChange(e){this.setData({cityVisible:e.detail.value})},
 editCard(){
  const id=this.postId||"draft";wx.setStorageSync("price-fairness-poster",{post:{...this.data.draft,id},analysis:this.data.analysis});

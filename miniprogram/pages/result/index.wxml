@@ -9,8 +9,9 @@
   <view wx:elif="{{cardError}}" class="card-placeholder" catchtap="renderCard">生成失败，点此重试</view>
  </view>
  <canvas type="2d" id="result-card" class="export-canvas"/>
+ <view class="mood-options" aria-label="选择卡片语气"><button class="mood-option {{!draft.mood||draft.mood==='neutral'?'mood-selected':''}}" data-mood="neutral" bindtap="moodChange" disabled="{{published}}">朋友评理</button><button class="mood-option {{draft.mood==='won'?'mood-selected':''}}" data-mood="won" bindtap="moodChange" disabled="{{published}}">感觉赚了</button><button class="mood-option {{draft.mood==='ripped'?'mood-selected':''}}" data-mood="ripped" bindtap="moodChange" disabled="{{published}}">怀疑冤了</button></view>
  <view class="small-actions"><text bindtap="editCard">换个样子</text><text bindtap="toggleReferences">价格依据</text><text bindtap="toggleOptions">分享范围</text></view>
- <view class="fineprint">{{cloud?'保存图片无需发布，同城展示由你选择。':'本机体验暂不能邀请其他设备参与。'}}</view>
+ <view class="fineprint">{{cloud?'语气是你的感受，指数按样本计算；存图无需发布。':'本机体验暂不能邀请其他设备参与。'}}</view>
  <view class="action-bar"><button class="primary" loading="{{publishing}}" disabled="{{publishing}}" bindtap="publish">{{cloud?'发布并查看详情 ↗':'看看评理页 ↗'}}</button><button class="save-button" disabled="{{cardBusy||busy||!preview||saving}}" loading="{{saving}}" bindtap="saveCard">存图晒朋友圈</button></view>
 </view>
 <view wx:if="{{showReferences||showOptions}}" class="sheet-mask" bindtap="closeSheet" catchtouchmove="noop">

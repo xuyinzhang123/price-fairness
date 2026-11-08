@@ -19,8 +19,9 @@ function placeInput(body){
  return {placeName:optional(body.placeName,"店名或摊位",120),locationHint:optional(body.locationHint,"位置或地标",160),scene};
 }
 function quoteInput(body) {
+  const mood=body.mood||"neutral";if(!["neutral","won","ripped"].includes(mood))throw new Error("卡片语气无效");
   if(!["paid","seen"].includes(body.priceType)) throw new Error("请选择实付价或看到的报价");
-  return {...placeInput(body),name:text(body.name,"商品或服务名称"),city:text(body.city,"城市"),price:price(body.price),
+  return {mood,...placeInput(body),name:text(body.name,"商品或服务名称"),city:text(body.city,"城市"),price:price(body.price),
     priceType:body.priceType,observedAt:observation(body.observedAt),
     note:body.note===undefined||body.note===""?"":text(body.note,"说明",200)};
 }

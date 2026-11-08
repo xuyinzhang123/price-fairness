@@ -15,7 +15,7 @@ test("brightening keeps alpha and caps highlights without changing original buff
 test("unknown and invalid scores never produce a numeric badge",()=>{
  const p={name:"蛋炒饭",price:25};
  for(const a of [null,{status:"insufficient",count:4},{status:"ready",count:4,score:99},{status:"ready",count:9,score:NaN}]){
-  const copy=cardCopy(p,a);assert.equal(copy.headline,"冤不冤暂时不知道");assert.equal(copy.caption,"先让朋友评评理。");assert.equal(copy.badge,"等待朋友评理");
+  const copy=cardCopy(p,a);assert.equal(copy.headline,"这价格，冤不冤？");assert.equal(copy.caption,"先让朋友评评理。");assert.equal(copy.badge,"这单消费，值得晒");
  }
 });
 test("real score copy includes sample information and high/low tone",()=>{
@@ -40,4 +40,9 @@ test("all templates draw and hiding city removes city text while preserving sour
 test("full-photo option uses image without source cropping",()=>{
  const ctx=context();drawCard(ctx,{name:"面",price:12},null,{fit:"contain"},{width:600,height:1200});
  assert.equal(ctx.images.length,1);assert.equal(ctx.images[0].length,5);
+});
+test("user feeling is independent of numeric result and works without samples",()=>{
+ const analysis={status:"ready",score:92,title:"大冤种",count:12};const before=JSON.stringify(analysis);
+ const won=cardCopy({mood:"won"},analysis);assert.equal(won.caption,"感觉赚大了！");assert.ok(won.badge.includes("我的感受"));assert.ok(won.system.includes("92"));assert.ok(won.system.includes("大冤种"));assert.equal(JSON.stringify(analysis),before);
+ const unknown=cardCopy({mood:"ripped"},null);assert.equal(unknown.caption,"我是不是大冤种？");assert.equal(unknown.system,"个人感受，等朋友来评理。");assert.ok(unknown.evidence.includes("暂不评分"));
 });

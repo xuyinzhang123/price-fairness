@@ -135,3 +135,9 @@ test("native location input accepts custom county and applies a suggestion",()=>
  p.cityInput({detail:{value:"我自己填写的地方"}});assert.equal(p.data.city,"我自己填写的地方");assert.equal(p.data.citySuggestions.length,0);
  p.cityPick({currentTarget:{dataset:{value:"湖州·德清县"}}});assert.equal(p.data.city,"湖州·德清县");assert.equal(p.data.citySuggestionsOpen,false);
 });
+
+test("choosing card feeling persists draft without changing analysis or publishing",async()=>{
+ let saved;const p=page("result",{enabled:()=>false},{},{setStorageSync(k,v){saved=v}});p.data.draft={name:"这一桌饭",city:"台前",price:68};p.data.analysis={status:"ready",score:90,count:6};const analysis=p.data.analysis;
+ p.moodChange({currentTarget:{dataset:{mood:"won"}}});assert.equal(saved.mood,"won");assert.equal(p.data.analysis,analysis);assert.equal(p.data.published,false);
+ p.data.published=true;p.moodChange({currentTarget:{dataset:{mood:"ripped"}}});assert.equal(p.data.draft.mood,"won");
+});

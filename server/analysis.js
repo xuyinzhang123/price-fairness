@@ -29,7 +29,8 @@ function buildAnalysis(subject,userQuotes,searchResult,now=Date.now()) {
     references.push({id:q.id||key,name:q.name,city:q.city,price:q.price,priceType:q.priceType,
       placeName:q.placeName||"",locationHint:q.locationHint||"",scene:q.scene||"",observedAt:q.observedAt,source:q.source,...(q.source==="web"?{url:q.url}:{})});
   }
-  return {...scorePrice(subject.price,references.map(q=>q.price)),references,
+  const summary=/一桌|这桌|整桌|一顿|这顿|一餐|账单|总价|总计|合计/.test(subject.name)?{status:"insufficient",count:references.length,reason:"conditions_required",message:"整顿或账单总价可以晒，但暂不作为单品评分。"}:scorePrice(subject.price,references.map(q=>q.price));
+  return {...summary,references,
     searchStatus:searchResult.status,algorithmVersion:"percentile-v1",windowDays:90,
     updatedAt:new Date(now).toISOString()};
 }

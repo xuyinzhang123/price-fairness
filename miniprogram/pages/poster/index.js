@@ -1,9 +1,9 @@
 const {WIDTH,HEIGHT,drawCard}=require("../../utils/poster");
-Page({data:{theme:"receipt",fit:"cover",position:0.5,brightness:6,hideCity:false,busy:true,error:"",preview:"",saving:false,showEditor:false},
+Page({data:{mood:"neutral",theme:"receipt",fit:"cover",position:0.5,brightness:6,hideCity:false,busy:true,error:"",preview:"",saving:false,showEditor:false},
 onLoad(q){
  const draft=wx.getStorageSync("price-fairness-poster");
  if(!draft||!draft.post||draft.post.id!==q.id){this.setData({error:"请从晒价详情页重新生成分享卡",busy:false});return}
- this.post=draft.post;this.analysis=draft.analysis;
+ this.post=draft.post;this.analysis=draft.analysis;this.setData({mood:this.post.mood||"neutral"});
 },
 onReady(){
  if(!this.post)return;
@@ -29,12 +29,13 @@ async render(){
  this.setData({busy:true,error:"",preview:""});
  try{
   const image=await this.getImage();if(this.closed||id!==this.renderId)return;
-  drawCard(this.canvas.getContext("2d"),this.post,this.analysis,this.data,image);
+  drawCard(this.canvas.getContext("2d"),{...this.post,mood:this.data.mood},this.analysis,this.data,image);
   const output=await new Promise((resolve,reject)=>wx.canvasToTempFilePath({canvas:this.canvas,fileType:"png",
    x:0,y:0,width:WIDTH,height:HEIGHT,destWidth:WIDTH,destHeight:HEIGHT,success:resolve,fail:reject},this));
   if(!this.closed&&id===this.renderId)this.setData({preview:output.tempFilePath,busy:false});
  }catch(_){if(!this.closed&&id===this.renderId)this.setData({error:"分享卡生成失败，请检查照片是否还能打开，再试一次。",busy:false})}
 },
+moodChange(e){const mood=e.currentTarget.dataset.mood;if(!["neutral","won","ripped"].includes(mood))return;this.setData({mood});this.render()},
 toggleEditor(){this.setData({showEditor:!this.data.showEditor})},
 theme(e){this.setData({theme:e.currentTarget.dataset.theme},()=>this.render())},
 fit(e){this.setData({fit:e.detail.value?"contain":"cover"},()=>this.render())},

@@ -8,6 +8,7 @@ function openDatabase(filename) {
   db.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON;");
   db.exec(fs.readFileSync(path.join(__dirname,"schema.sql"),"utf8"));
   const repository = {
+    getMood(id) {return db.prepare("SELECT mood FROM post_moods WHERE post_id=?").get(id)?.mood||"neutral";},
     getPlace(id) {
       const r=db.prepare("SELECT * FROM quote_places WHERE quote_id=?").get(id);
       return {placeName:r?.place_name||"",locationHint:r?.location_hint||"",scene:r?.scene||""};
@@ -20,17 +21,18 @@ function openDatabase(filename) {
         if(image)db.prepare("INSERT INTO media VALUES(?,?,?,?)").run(mediaId,image.mimeType,image.bytes,createdAt);
         db.prepare("INSERT INTO posts VALUES(?,?,?,?)").run(id,quote.id,mediaId,createdAt);
         db.prepare("INSERT INTO post_discovery VALUES(?,?)").run(id,input.cityVisible===true?1:0);
+        db.prepare("INSERT INTO post_moods VALUES(?,?)").run(id,input.mood||"neutral");
         db.exec("COMMIT");return repository.getPost(id);
       }catch(e){db.exec("ROLLBACK");throw e}
     },
     listPosts(city,publicOnly=false,name="") {
       return db.prepare("SELECT p.id,p.quote_id,p.media_id,p.created_at,q.name,q.city,q.price_cents,q.price_type,q.observed_at,q.note FROM posts p JOIN quotes q ON q.id=p.quote_id"+(publicOnly?" WHERE q.city=? AND EXISTS(SELECT 1 FROM post_discovery d WHERE d.post_id=p.id AND d.city_visible=1) AND (?='' OR instr(q.name,?)>0)":"")+" ORDER BY p.created_at DESC LIMIT 100").all(...(publicOnly?[city,name,name]:[]))
-       .map(r=>({...repository.getPlace(r.quote_id),id:r.id,quoteId:r.quote_id,name:r.name,city:r.city,price:r.price_cents/100,priceType:r.price_type,observedAt:r.observed_at,note:r.note,createdAt:r.created_at,image:r.media_id?"/api/media/"+r.media_id:""}));
+       .map(r=>({...repository.getPlace(r.quote_id),mood:repository.getMood(r.id),id:r.id,quoteId:r.quote_id,name:r.name,city:r.city,price:r.price_cents/100,priceType:r.price_type,observedAt:r.observed_at,note:r.note,createdAt:r.created_at,image:r.media_id?"/api/media/"+r.media_id:""}));
     },
     getPost(id) {
       const row=db.prepare("SELECT p.id,p.quote_id,p.media_id,p.created_at,q.name,q.city,q.price_cents,q.price_type,q.observed_at,q.note FROM posts p JOIN quotes q ON q.id=p.quote_id WHERE p.id=?").get(id);
       if(!row)return null;
-      return {...repository.getPlace(row.quote_id),cityVisible:repository.cityVisible(id),reactions:repository.reactions(id),id:row.id,quoteId:row.quote_id,name:row.name,city:row.city,price:row.price_cents/100,priceType:row.price_type,observedAt:row.observed_at,note:row.note,createdAt:row.created_at,image:row.media_id?"/api/media/"+row.media_id:"",
+      return {...repository.getPlace(row.quote_id),mood:repository.getMood(id),cityVisible:repository.cityVisible(id),reactions:repository.reactions(id),id:row.id,quoteId:row.quote_id,name:row.name,city:row.city,price:row.price_cents/100,priceType:row.price_type,observedAt:row.observed_at,note:row.note,createdAt:row.created_at,image:row.media_id?"/api/media/"+row.media_id:"",
         replies:db.prepare("SELECT r.id,r.quote_id,r.note,r.created_at,q.price_cents,q.price_type,q.observed_at FROM replies r LEFT JOIN quotes q ON q.id=r.quote_id WHERE r.post_id=? ORDER BY r.created_at DESC,r.id DESC LIMIT 200").all(id)
          .map(r=>({...repository.getPlace(r.quote_id),id:r.id,quoteId:r.quote_id,note:r.note,createdAt:r.created_at,price:r.price_cents===null?null:r.price_cents/100,priceType:r.price_type,observedAt:r.observed_at}))};
     },

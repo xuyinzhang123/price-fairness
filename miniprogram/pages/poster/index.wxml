@@ -5,7 +5,7 @@
 <button class="primary" disabled="{{busy||!preview||saving}}" loading="{{saving}}" bindtap="save">保存图片，去晒朋友圈</button>
 <button class="secondary" disabled="{{busy||!preview}}" bindtap="preview">查看大图</button>
 <view class="link" bindtap="toggleEditor">{{showEditor?'收起调整':'想换个样子？展开调整'}}</view>
-<block wx:if="{{showEditor}}">
+<block wx:if="{{showEditor}}"><view class="templates"><button data-mood="neutral" bindtap="moodChange" class="{{mood==='neutral'?'active':''}}">朋友评理</button><button data-mood="won" bindtap="moodChange" class="{{mood==='won'?'active':''}}">感觉赚了</button><button data-mood="ripped" bindtap="moodChange" class="{{mood==='ripped'?'active':''}}">怀疑冤了</button></view><view class="notice">这里只调整分享图片的语气，不改变原帖和系统指数。</view>
  <view class="templates"><button class="{{theme==='receipt'?'active':''}}" data-theme="receipt" bindtap="theme">简洁账单</button><button class="{{theme==='playful'?'active':''}}" data-theme="playful" bindtap="theme">趣味吐槽</button><button class="{{theme==='magazine'?'active':''}}" data-theme="magazine" bindtap="theme">杂志封面</button></view>
  <view class="card"><view class="row"><text>保留完整照片</text><switch color="#7047eb" checked="{{fit==='contain'}}" bindchange="fit"/></view>
  <view wx:if="{{fit==='cover'}}"><view class="label">裁切位置（上 ↔ 下）</view><slider min="0" max="100" value="{{position*100}}" bindchange="position" activeColor="#7047eb"/></view>

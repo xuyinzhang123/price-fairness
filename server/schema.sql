@@ -69,3 +69,5 @@ CREATE TABLE IF NOT EXISTS api_usage (
  used INTEGER NOT NULL DEFAULT 0,
  PRIMARY KEY(period,bucket)
 );
+
+CREATE TABLE IF NOT EXISTS post_moods (post_id TEXT PRIMARY KEY REFERENCES posts(id), mood TEXT NOT NULL DEFAULT 'neutral');

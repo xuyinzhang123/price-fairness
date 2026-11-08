@@ -7,3 +7,5 @@ test('hotels never get a percentile without required conditions even with enough
 test('same prices remain at the middle percentile',()=>{assert.equal(buildUserAnalysis({...subject,price:18},Array.from({length:5},(_,i)=>row(18,i)),{now}).score,50)});
 
 test('published post has the same score for different viewers',()=>{const records=[10,12,15,18,20].map((p,i)=>row(p,i));const a=buildUserAnalysis(subject,records,{viewer:'user1',subjectOwner:'original-author',now});const b=buildUserAnalysis(subject,records,{viewer:'user2',subjectOwner:'original-author',now});assert.equal(a.score,b.score);assert.equal(a.count,5)});
+
+test('whole meal total is shareable but never assigned an item percentile',()=>{const s={...subject,name:'这一桌饭'};const a=buildUserAnalysis(s,[100,200,250,300,400].map((p,i)=>row(p,i,{name:s.name})),{now});assert.equal(a.reason,'conditions_required');assert.equal(a.score,undefined);assert.match(a.message,/总价/)});
