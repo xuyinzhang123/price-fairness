@@ -141,3 +141,11 @@ test("choosing card feeling persists draft without changing analysis or publishi
  p.moodChange({currentTarget:{dataset:{mood:"won"}}});assert.equal(saved.mood,"won");assert.equal(p.data.analysis,analysis);assert.equal(p.data.published,false);
  p.data.published=true;p.moodChange({currentTarget:{dataset:{mood:"ripped"}}});assert.equal(p.data.draft.mood,"won");
 });
+
+test('location suggestions remain selectable after keyboard dismiss and close after selection',()=>{
+ for(const name of ['confirm','community']){let hidden=0;const p=page(name,{enabled:()=>false},{read:()=>[]},{setStorageSync(){},hideKeyboard(){hidden++}});
+ p.cityInput({detail:{value:'常熟'}});assert.equal(p.data.citySuggestionsOpen,true);assert.ok(p.data.citySuggestions.some(r=>r.value.includes('常熟')));assert.ok(p.data.citySuggestionHeight<=190);
+ p.cityBlur();assert.equal(p.data.citySuggestionsOpen,true);
+ p.cityPick({currentTarget:{dataset:{value:'苏州·常熟市'}}});assert.equal(p.data.city,'苏州·常熟市');assert.equal(p.data.citySuggestionsOpen,false);assert.equal(hidden,1);
+ }
+});

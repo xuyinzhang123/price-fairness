@@ -1,13 +1,13 @@
 const {locationMatches}=require("../../utils/location-match");
 const {suggestLocations}=require("../../utils/location-suggestions");
 const store=require("../../utils/store");const api=require("../../utils/api");
-Page({data:{citySuggestions:[],citySuggestionsOpen:false,region:[],items:[],cloud:false,error:"",city:"",name:"",loading:false,searched:false},
+Page({data:{citySuggestionHeight:190,citySuggestions:[],citySuggestionsOpen:false,region:[],items:[],cloud:false,error:"",city:"",name:"",loading:false,searched:false},
 onShow(){if(!this.data.city&&wx.getStorageSync)this.setData({city:wx.getStorageSync("price-fairness-city")||""});return this.search()},
-cityInput(e){this.cityChange(e);this.setData({citySuggestions:suggestLocations(e.detail.value),citySuggestionsOpen:true})},
-cityFocus(){clearTimeout(this.cityCloseTimer);this.setData({citySuggestions:suggestLocations(this.data.city),citySuggestionsOpen:true})},
-cityBlur(){this.cityCloseTimer=setTimeout(()=>this.setData({citySuggestionsOpen:false}),200)},
-cityPick(e){clearTimeout(this.cityCloseTimer);this.cityChange({detail:{value:e.currentTarget.dataset.value}});this.setData({citySuggestionsOpen:false})},
-cityConfirm(){this.setData({citySuggestionsOpen:false});this.search()},
+cityInput(e){this.cityChange(e);const citySuggestions=suggestLocations(e.detail.value);this.setData({citySuggestions,citySuggestionHeight:Math.min(190,citySuggestions.length*48+44),citySuggestionsOpen:true})},
+cityFocus(){clearTimeout(this.cityCloseTimer);const citySuggestions=suggestLocations(this.data.city);this.setData({citySuggestions,citySuggestionHeight:Math.min(190,citySuggestions.length*48+44),citySuggestionsOpen:true})},
+cityBlur(){clearTimeout(this.cityCloseTimer)},
+cityPick(e){clearTimeout(this.cityCloseTimer);this.cityChange({detail:{value:e.currentTarget.dataset.value}});this.setData({citySuggestionsOpen:false});if(wx.hideKeyboard)wx.hideKeyboard({})},
+cityConfirm(){if(wx.hideKeyboard)wx.hideKeyboard({});this.search()},
 cityChange(e){const value=e.detail.value;const region=Array.isArray(value)?value:[];let city=region.length?(region[1]==="市辖区"||region[1]==="县"?region[0]:region[1]):value;city=city||"";if(!city.includes("·"))city=city.replace(/市$/,"");this.setData({city,region});wx.setStorageSync("price-fairness-city",city)},
 nameChange(e){this.setData({name:e.detail.value})},
 async search(){
