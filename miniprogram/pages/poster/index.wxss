@@ -1,0 +1,1 @@
+.templates{display:flex;gap:12rpx;margin:28rpx 0}.templates button{flex:1;font-size:24rpx;padding:12rpx 0;background:#ece6ef;border-radius:18rpx}.templates .active{background:#7047eb;color:#ffffff;font-weight:700}.poster{width:100%;height:1017rpx;border-radius:20rpx;overflow:hidden}.label{margin-top:26rpx}

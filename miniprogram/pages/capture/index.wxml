@@ -1,0 +1,5 @@
+<view class="capture">
+<camera wx:if="{{!failed}}" class="viewfinder" device-position="back" flash="off" bindinitdone="ready" binderror="error" bindstop="error"/>
+<view wx:else class="camera-error"><view>相机暂时不可用</view><text>电脑模拟器无法代替手机相机。手机上请检查相机权限，也可以主动选择相册。</text></view>
+<view class="capture-controls"><view>拍下商品、服务或消费凭证</view><button class="shutter" disabled="{{!ready||busy}}" loading="{{busy}}" bindtap="take">拍照</button><view bindtap="album" class="album">从相册选</view></view>
+</view>

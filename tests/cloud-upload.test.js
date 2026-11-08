@@ -1,0 +1,5 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const vm=require('node:vm');
+test('cloud photo upload sends only file reference to publish, never base64',async()=>{
+ let path,reads=0;const context={module:{exports:{}},require(id){if(id==='../config')return {cloudEnv:'cloud1-example',cloudFunction:'priceApi'};return {prepareUpload:async()=>'/compressed.jpg'}},wx:{cloud:{callFunction:async r=>{assert.equal(r.data.path,'/api/upload-target');return {result:{cloudPath:'prices/owner/photo.jpg'}}},uploadFile:async r=>{path=r;return {fileID:'cloud://env.bucket/prices/owner/photo.jpg'}}},getFileSystemManager(){reads++;throw Error('must not encode cloud photo')}}};
+ vm.runInNewContext(fs.readFileSync('miniprogram/utils/api.js','utf8'),context);const payload=await context.module.exports.imagePayload('/original.jpg');assert.equal(payload.imageBase64,undefined);assert.equal(payload.imageFileId,'cloud://env.bucket/prices/owner/photo.jpg');assert.equal(reads,0);assert.equal(path.filePath,'/compressed.jpg');
+});

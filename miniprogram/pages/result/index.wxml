@@ -1,0 +1,30 @@
+<view class="result-page">
+ <view class="result-header"><view class="eyebrow">钱都花了，来评评理。</view><view class="result-heading">这一单，值得晒。</view></view>
+ <view wx:if="{{busy}}" class="status">正在找同城参考价…</view>
+ <view wx:elif="{{error}}" class="status" bindtap="analyze">暂时没查到参考价 · 点此重试</view>
+ <view wx:elif="{{!cloud}}" class="status">本机体验 · 暂不生成真实分数</view>
+ <view class="card-stage" bindtap="previewCard">
+  <image wx:if="{{preview}}" src="{{preview}}" mode="aspectFit" class="card-image"/>
+  <view wx:elif="{{cardBusy}}" class="card-placeholder">正在给这单消费做封面…</view>
+  <view wx:elif="{{cardError}}" class="card-placeholder" catchtap="renderCard">生成失败，点此重试</view>
+ </view>
+ <canvas type="2d" id="result-card" class="export-canvas"/>
+ <view class="small-actions"><text bindtap="editCard">换个样子</text><text bindtap="toggleReferences">价格依据</text><text bindtap="toggleOptions">分享范围</text></view>
+ <view class="fineprint">{{cloud?'保存图片无需发布，同城展示由你选择。':'本机体验暂不能邀请其他设备参与。'}}</view>
+ <view class="action-bar"><button class="primary" loading="{{publishing}}" disabled="{{publishing}}" bindtap="publish">{{cloud?'发布并查看详情 ↗':'看看评理页 ↗'}}</button><button class="save-button" disabled="{{cardBusy||busy||!preview||saving}}" loading="{{saving}}" bindtap="saveCard">存图晒朋友圈</button></view>
+</view>
+<view wx:if="{{showReferences||showOptions}}" class="sheet-mask" bindtap="closeSheet" catchtouchmove="noop">
+ <view class="result-sheet" catchtap="noop">
+  <view class="sheet-title"><text>{{showReferences?'价格依据':'分享范围'}}</text><text bindtap="closeSheet">关闭</text></view>
+  <scroll-view scroll-y class="sheet-scroll">
+   <block wx:if="{{showReferences}}">
+    <view>本次有效参考 {{analysis?analysis.count:0}} 条</view>
+    <view wx:if="{{analysis.status==='ready'}}" class="notice">参考中位价 ¥{{analysis.median}} · 近 {{analysis.windowDays}} 天<br/>指数表示本次同城样本中的价格位置。</view>
+    <view wx:else class="notice">还没有足够的可比报价，不硬给分数。朋友仍可以投票、留言和补价。</view>
+    <view wx:for="{{analysis.references}}" wx:key="id"><view class="divider"/><view class="row"><text>{{item.source==='web'?'公开报价':'用户报价'}}</text><text>¥{{item.price}}</text></view><view class="place-line">{{item.placeName||"店名未提供"}} · {{item.scene||"场景未提供"}}<br/>{{item.locationHint}}</view><view class="notice">{{item.observedAt}}</view><text wx:if="{{item.url}}" selectable class="notice">{{item.url}}</text></view>
+   </block>
+   <block wx:else><view class="row"><text>也让同城的人评评理</text><switch color="#7047eb" checked="{{cityVisible}}" disabled="{{published}}" bindchange="visibilityChange"/></view><view class="notice">默认不进入同城列表，生成评理帖时保存此选择。</view></block>
+  </scroll-view>
+  <button class="secondary" bindtap="closeSheet">知道了</button>
+ </view>
+</view>

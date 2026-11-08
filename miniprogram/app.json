@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/camera/index",
+    "pages/community/index",
+    "pages/mine/index",
+    "pages/confirm/index",
+    "pages/result/index",
+    "pages/quote/index",
+    "pages/detail/index",
+    "pages/poster/index",
+    "pages/capture/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "冤种指数",
+    "navigationBarBackgroundColor": "#FBF8F4",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FBF8F4"
+  },
+  "tabBar": {
+    "color": "#82798a",
+    "selectedColor": "#7047eb",
+    "backgroundColor": "#FBF8F4",
+    "list": [
+      {
+        "pagePath": "pages/camera/index",
+        "text": "拍照测价"
+      },
+      {
+        "pagePath": "pages/community/index",
+        "text": "大家晒价"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
+  }
+}

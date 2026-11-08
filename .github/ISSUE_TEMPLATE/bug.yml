@@ -1,0 +1,17 @@
+name: Bug 反馈
+description: 报告无法正常完成的操作
+title: "[Bug] "
+body:
+  - type: textarea
+    attributes:
+      label: 问题与复现步骤
+      description: 请提供操作、预期和实际结果，不要附密钥或个人数据。
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: 设备与版本
+      placeholder: 手机型号 / 系统 / 微信版本 / 项目版本
+  - type: textarea
+    attributes:
+      label: 完整报错和验证情况

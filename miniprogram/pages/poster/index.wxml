@@ -1,0 +1,15 @@
+<view class="page"><view class="eyebrow">给这笔消费，做张封面</view><view class="title">好看一点，再晒。</view>
+<canvas type="2d" id="poster" class="poster"/>
+<view wx:if="{{busy}}" class="notice">正在生成分享卡…</view>
+<view wx:if="{{error}}" class="notice">{{error}}<button class="secondary" bindtap="render">重新生成</button></view>
+<button class="primary" disabled="{{busy||!preview||saving}}" loading="{{saving}}" bindtap="save">保存图片，去晒朋友圈</button>
+<button class="secondary" disabled="{{busy||!preview}}" bindtap="preview">查看大图</button>
+<view class="link" bindtap="toggleEditor">{{showEditor?'收起调整':'想换个样子？展开调整'}}</view>
+<block wx:if="{{showEditor}}">
+ <view class="templates"><button class="{{theme==='receipt'?'active':''}}" data-theme="receipt" bindtap="theme">简洁账单</button><button class="{{theme==='playful'?'active':''}}" data-theme="playful" bindtap="theme">趣味吐槽</button><button class="{{theme==='magazine'?'active':''}}" data-theme="magazine" bindtap="theme">杂志封面</button></view>
+ <view class="card"><view class="row"><text>保留完整照片</text><switch color="#7047eb" checked="{{fit==='contain'}}" bindchange="fit"/></view>
+ <view wx:if="{{fit==='cover'}}"><view class="label">裁切位置（上 ↔ 下）</view><slider min="0" max="100" value="{{position*100}}" bindchange="position" activeColor="#7047eb"/></view>
+ <view class="label">适度提亮</view><slider min="0" max="20" value="{{brightness}}" bindchange="brightness" activeColor="#7047eb"/>
+ <view class="row"><text>卡片隐藏地点</text><switch color="#7047eb" checked="{{hideCity}}" bindchange="city"/></view></view>
+</block>
+<view class="notice">仅调整卡片展示，原照片保留。隐藏地点仅影响城市和店名等卡片标签，照片里的地址仍需你检查。保存后自行发朋友圈，图片暂不含小程序码。</view></view>

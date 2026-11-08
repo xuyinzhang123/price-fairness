@@ -1,0 +1,7 @@
+**
+!server/
+!server/**
+!Dockerfile
+server/data/
+server/*.lock
+server/probe-*

@@ -1,0 +1,13 @@
+name: 改进建议
+description: 提议具体的产品或技术改进
+title: "[Feature] "
+body:
+  - type: textarea
+    attributes:
+      label: 要解决什么问题
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 建议与验收方式
+      description: 优先保持操作简单，并说明是否需要付费服务。

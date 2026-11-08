@@ -1,0 +1,2 @@
+const store=require("../../utils/store");const api=require("../../utils/api");
+Page({data:{count:0,cloud:false,error:""},async onShow(){this.setData({cloud:api.enabled(),error:""});if(!api.enabled()){this.setData({count:store.read().length});return}try{this.setData({count:(await api.request("/api/mine",undefined,"GET")).count})}catch(e){this.setData({count:0,error:"暂时无法读取云端记录"})}},notes(){wx.switchTab({url:"/pages/community/index"})}});

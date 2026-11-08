@@ -1,0 +1,7 @@
+<view class="page home-page">
+ <view class="eyebrow">PRICE FAIRNESS / 冤种指数</view>
+ <view class="hero"><view class="stamp">¥ ?</view><view class="title home-title">这价格，冤不冤？</view><view class="subtitle">钱都花了，看看自己冤不冤。</view></view>
+ <button class="primary" bindtap="camera">晒晒这单，冤不冤 ↗</button>
+ <view class="row alternatives"><view bindtap="album">从相册选</view><view bindtap="manual">手动输入</view></view>
+ <view class="notice">晒一笔消费，让朋友评评理</view>
+</view>

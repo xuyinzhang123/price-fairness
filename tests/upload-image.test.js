@@ -1,0 +1,11 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const vm=require('node:vm');const fs=require('node:fs');
+function setup(sizes,fail=false){const calls=[];let i=0;const context={module:{exports:{}},wx:{getFileSystemManager:()=>({getFileInfo(o){o.success({size:sizes[o.filePath]??9000000})}}),getImageInfo(o){o.success({width:4000,height:3000})},compressImage(o){calls.push(o);if(fail)o.fail({});else o.success({tempFilePath:'compressed'+(++i)})}}};vm.runInNewContext(fs.readFileSync('miniprogram/utils/upload-image.js','utf8'),context);return {...context.module.exports,calls};}
+test('small photo uploads unchanged without compression',async()=>{const s=setup({original:200000});assert.equal(await s.prepareUpload('original'),'original');assert.equal(s.calls.length,0)});
+test('large camera photo is resized proportionally and retried until payload fits',async()=>{const s=setup({original:12000000,compressed1:950000,compressed2:450000});assert.equal(await s.prepareUpload('original'),'compressed2');assert.equal(s.calls[0].compressedWidth,1600);assert.equal(s.calls[0].compressedHeight,1200);assert.equal(s.calls[1].src,'original')});
+test('compression failure never passes oversized original to upload',async()=>{const s=setup({original:12000000},true);await assert.rejects(s.prepareUpload('original'),/照片处理失败/);assert.equal(s.calls.length,2)});
+
+test('PNG that resists system compression is re-encoded through canvas',async()=>{
+ let exported=false;const sizes={original:8000000,system:8000000,jpeg:300000};
+ const wx={getFileSystemManager:()=>({getFileInfo(o){o.success({size:sizes[o.filePath]})}}),getImageInfo(o){o.success({width:4000,height:3000,type:'png'})},compressImage(o){o.success({tempFilePath:'system'})},createOffscreenCanvas({width,height}){assert.equal(width,1200);assert.equal(height,900);return {createImage(){return {set src(value){this.onload()}}},getContext(){return {fillRect(){},drawImage(){}}}}},canvasToTempFilePath(o){assert.equal(o.fileType,'jpg');exported=true;o.success({tempFilePath:'jpeg'})}};
+ const context={module:{exports:{}},wx};vm.runInNewContext(fs.readFileSync('miniprogram/utils/upload-image.js','utf8'),context);assert.equal(await context.module.exports.prepareUpload('original'),'jpeg');assert.equal(exported,true);
+});

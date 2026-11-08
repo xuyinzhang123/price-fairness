@@ -1,0 +1,20 @@
+<view class="page"><view class="title">确认一下</view><view class="subtitle">消费了什么，花了多少？</view>
+<image wx:if="{{image}}" src="{{image}}" mode="aspectFill" class="photo"/>
+<view class="notice">{{recognition==='loading'?'正在识别，你也可以直接填写。':recognition==='ready'?'已识别，请确认名称和价格。':recognition==='failed'?'识别暂时失败，请手动填写。':'写下名称和金额，就能先试试。'}}</view>
+<view class="field"><text class="label">商品或服务名称</text><input placeholder="例如：蛋炒饭 / 全季酒店大床房" value="{{name}}" data-field="name" bindinput="change"/></view>
+<view class="field"><text class="label">价格 / 元</text><input value="{{price}}" type="digit" placeholder="你看到或支付的价格" data-field="price" bindinput="change"/></view>
+<view class="field"><text class="label">城市</text><picker mode="region" value="{{region}}" bindchange="cityChange"><view class="city-picker"><text>{{city||"请选择消费城市"}}</text><text class="muted">选择城市 ›</text></view></picker></view>
+<view class="field"><text class="label">默认按实付价，可切换</text><switch color="#7047eb" checked="{{paid}}" bindchange="paidChange"/> <text>{{paid?'实际支付':'看到的报价'}}</text></view>
+<view class="place-toggle" bindtap="togglePlace"><text>在哪里买的？</text><text>{{placeName||scene||"地点选填 ＋"}}</text></view>
+<button class="primary" bindtap="submit">生成我的消费卡片</button><view class="notice">先看卡片，再决定要不要晒。</view></view>
+<view wx:if="{{showPlace}}" class="sheet-mask" bindtap="closePlace" catchtouchmove="noop">
+ <view class="place-sheet" catchtap="noop"><view class="sheet-heading"><text>留个地点，下次好找</text><text bindtap="closePlace">关闭</text></view>
+  <scroll-view scroll-y class="sheet-content">
+   <view class="label">店名 / 摊位（选填）</view><input maxlength="120" value="{{placeName}}" data-field="placeName" bindinput="change" placeholder="例如：人民路口炒饭摊"/>
+   <view class="label">附近地标（选填）</view><input maxlength="160" value="{{locationHint}}" data-field="locationHint" bindinput="change" placeholder="记录当时位置，不填私人住址"/>
+   <view class="label">消费场景（选填）</view><view class="scene-options"><text wx:for="{{scenes}}" wx:key="*this" class="scene-chip {{scene===item?'scene-selected':''}}" data-scene="{{item}}" bindtap="sceneChange">{{item}}</text></view>
+   <view class="type-row"><text>{{paid?'实际支付':'看到的报价'}}</text><switch color="#7047eb" checked="{{paid}}" bindchange="paidChange"/></view>
+  </scroll-view>
+  <button class="primary" bindtap="closePlace">就这样</button>
+ </view>
+</view>
