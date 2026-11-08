@@ -20,7 +20,7 @@ function validAnalysis(a){
 }
 function cardCopy(post,analysis){
  const mood=post&&post.mood||"neutral",ready=validAnalysis(analysis);
- const feelings={won:{headline:"这么多才这个价",caption:"感觉赚大了！",badge:"我的感受 · 感觉赚了"},ripped:{headline:"就这么点，花了这么多",caption:"我是不是大冤种？",badge:"我的感受 · 怀疑冤了"}};
+ const feelings={won:{headline:"这么多才这个价",caption:"感觉赚大了！",badge:"我的感受 · 感觉赚了"},ripped:{headline:"这单花了 ¥"+Number(post.price||0).toFixed(2).replace(/\.00$/,"")+"，感觉有点贵。",caption:"我是不是大冤种？",badge:"我的感受 · 怀疑冤了"}};
  const feeling=feelings[mood];
  const evidence=ready?"同城用户参考 "+analysis.count+" 条 · 近 "+(analysis.windowDays||90)+" 天"+(analysis.limited?" · 样本较少":""):"参考样本不足或条件不完整，暂不评分。";
  if(feeling)return {...feeling,evidence:ready?"第 "+analysis.score+" 百分位 · "+analysis.count+" 条参考 · 近 "+(analysis.windowDays||90)+" 天":evidence,system:ready?"系统参考：指数 "+analysis.score+" · "+analysis.title:""};
@@ -39,12 +39,16 @@ function line(ctx,text,x,y,size,color,width=608,weight="normal"){
 }
 function drawCard(ctx,post,analysis,options={},image){
  const t=THEMES[options.theme]||THEMES.receipt,copy=cardCopy(post,analysis);
+ const dark=options.theme==="magazine",purple=dark?"#a98aff":"#7047eb",panel=dark?"#393044":"#7047eb",panelInk=dark?"#fffaf5":"#ffffff",lime="#e5f59a";
  ctx.fillStyle=t.bg;ctx.fillRect(0,0,WIDTH,HEIGHT);
- line(ctx,"冤种指数 / PRICE FAIRNESS",56,66,21,t.ink);
- if(options.theme==="magazine"){ctx.fillStyle=t.accent;ctx.fillRect(56,87,74,5)}
- line(ctx,post.name||"我的这单",56,145,44,t.ink,430,"bold");
- line(ctx,"¥"+Number(post.price||0).toFixed(2),495,145,34,t.ink,170,"bold");
- const frame={x:56,y:180,w:608,h:390};
+ ctx.fillStyle=purple;ctx.fillRect(0,0,WIDTH,192);
+ line(ctx,"冤种指数",36,62,32,dark?"#24212b":"#ffffff",360,"bold");
+ line(ctx,"PRICE FAIRNESS / 消费手记",36,92,13,dark?"#393044":"#eee7fb",450);
+ line(ctx,post.name||"我的这单",36,158,40,dark?"#24212b":"#ffffff",420,"bold");
+ ctx.fillStyle=lime;ctx.fillRect(478,105,206,65);
+ line(ctx,"¥"+Number(post.price||0).toFixed(2),492,150,35,"#24212b",180,"bold");
+ ctx.fillStyle=t.ink;ctx.fillRect(630,42,54,4);ctx.fillRect(652,54,32,4);
+ const frame={x:32,y:208,w:656,h:408};
  ctx.save();ctx.beginPath();ctx.rect(frame.x,frame.y,frame.w,frame.h);ctx.clip();
  if(image){
   if(options.fit==="contain"){
@@ -62,19 +66,27 @@ function drawCard(ctx,post,analysis,options={},image){
   const pixels=ctx.getImageData(frame.x,frame.y,frame.w,frame.h);
   brighten(pixels.data,options.brightness);ctx.putImageData(pixels,frame.x,frame.y);
  }
- line(ctx,options.hideCity?"消费后的一点小情绪":String(post.city||"")+" · "+(post.priceType==="paid"?"实际支付":"看到的报价"),56,620,24,t.muted);
- if(!options.hideCity&&(post.placeName||post.scene))line(ctx,[post.placeName,post.scene].filter(Boolean).join(" · "),56,644,18,t.muted);
+ line(ctx,options.hideCity?"消费后的一点小情绪":String(post.city||"")+" · "+(post.priceType==="paid"?"实际支付":"看到的报价"),36,654,22,t.muted,648);
+ if(!options.hideCity&&(post.placeName||post.scene))line(ctx,[post.placeName,post.scene].filter(Boolean).join(" · "),36,682,17,t.muted,648);
  const feeling=post.mood==="won"||post.mood==="ripped";
- const high=validAnalysis(analysis)&&analysis.score>=81&&!feeling;
- if(!feeling){ctx.fillStyle=high?"#ffe1dc":t.accent;ctx.fillRect(56,651,608,66);line(ctx,copy.badge,76,696,30,high?"#a83d38":t.badgeInk,568,"bold")}
- line(ctx,copy.headline,56,feeling?735:785,38,t.ink,608,"bold");
- line(ctx,copy.caption,56,feeling?795:838,feeling?36:30,t.ink,608,feeling?"bold":"normal");
+ ctx.fillStyle=panel;ctx.fillRect(32,706,656,218);
+ ctx.fillStyle=lime;ctx.fillRect(52,730,6,22);
+ line(ctx,feeling?"消费后的心情 / MY TAKE":"这单消费 / PRICE NOTE",72,748,15,dark?"#d3c4eb":"#e7defb",570);
+ if(feeling){
+  line(ctx,copy.headline,52,799,post.mood==="ripped"?31:35,panelInk,616,"bold");
+  line(ctx,copy.caption,52,866,46,panelInk,616,"bold");
+ }else{
+  line(ctx,copy.headline,52,801,35,panelInk,616,"bold");
+  line(ctx,copy.caption,52,852,27,panelInk,616);
+  line(ctx,copy.badge,52,894,18,dark?"#d3c4eb":"#e7defb",616);
+ }
  if(validAnalysis(analysis)){
-  if(copy.system)line(ctx,copy.system,56,878,25,t.muted);
-  line(ctx,copy.evidence,56,925,21,t.muted);
- }else{line(ctx,"个人消费感受 · 暂无足够可比样本评分",56,945,20,t.muted)}
- const question=post.mood==="won"?"你们那边，这些得多少钱？":post.mood==="ripped"?"你们说，这单冤不冤？":"你觉得这个价格冤不冤？";
- line(ctx,question,56,1018,27,t.ink);
+  if(copy.system)line(ctx,copy.system,36,954,20,t.muted,648);
+  line(ctx,copy.evidence,36,981,17,t.muted,648);
+ }else{line(ctx,"个人消费感受 · 暂无足够可比样本评分",36,966,18,t.muted,648)}
+ const question=post.mood==="ripped"?(/(?:粉|面|粥|汤)$/.test(post.name||"")?"你们那边，这碗得多少钱？":"你们那边，这些得多少钱？"):post.mood==="won"?"你们那边，这些得多少钱？":"你觉得这个价格冤不冤？";
+ ctx.fillStyle=purple;ctx.fillRect(36,1010,4,29);
+ line(ctx,question,52,1034,26,t.ink,632,"bold");
  return copy;
 }
 module.exports={WIDTH,HEIGHT,THEMES,cropRect,brighten,validAnalysis,cardCopy,drawCard};

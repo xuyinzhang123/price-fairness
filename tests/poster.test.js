@@ -51,3 +51,5 @@ test("feeling card keeps one small note without duplicate banners or disclaimers
  const ctx=context();drawCard(ctx,{name:"涮牛肉",city:"南京·浦口区",price:140,mood:"won"},null,{},null);const texts=ctx.texts.map(t=>t.text);
  assert.ok(texts.includes("这么多才这个价"));assert.ok(texts.includes("感觉赚大了！"));assert.ok(texts.includes("你们那边，这些得多少钱？"));assert.equal(texts.some(t=>t.includes("我的感受")),false);assert.equal(texts.some(t=>t.includes("趣味参考")),false);assert.equal(texts.filter(t=>t.includes("评分")).length,1);
 });
+
+test("ripped copy describes price rather than judging portion and asks local bowl price",()=>{const ctx=context(),post={name:"清汤牛肉粉",price:16,mood:"ripped"};const c=drawCard(ctx,post,null,{},null);assert.equal(c.headline,"这单花了 ¥16，感觉有点贵。");assert.ok(ctx.texts.some(t=>t.text==="你们那边，这碗得多少钱？"));assert.equal(ctx.texts.some(t=>t.text.includes("就这么点")),false)});
