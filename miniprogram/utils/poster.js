@@ -23,7 +23,7 @@ function cardCopy(post,analysis){
  const feelings={won:{headline:"这么多才这个价",caption:"感觉赚大了！",badge:"我的感受 · 感觉赚了"},ripped:{headline:"就这么点，花了这么多",caption:"我是不是大冤种？",badge:"我的感受 · 怀疑冤了"}};
  const feeling=feelings[mood];
  const evidence=ready?"同城用户参考 "+analysis.count+" 条 · 近 "+(analysis.windowDays||90)+" 天"+(analysis.limited?" · 样本较少":""):"参考样本不足或条件不完整，暂不评分。";
- if(feeling)return {...feeling,evidence,system:ready?"系统参考：指数 "+analysis.score+" · "+analysis.title+" · 第"+analysis.score+"百分位":"个人感受，等朋友来评理。"};
+ if(feeling)return {...feeling,evidence:ready?"第 "+analysis.score+" 百分位 · "+analysis.count+" 条参考 · 近 "+(analysis.windowDays||90)+" 天":evidence,system:ready?"系统参考：指数 "+analysis.score+" · "+analysis.title:""};
  if(!ready)return {headline:"这价格，冤不冤？",caption:"先让朋友评评理。",badge:"这单消费，值得晒",evidence,system:""};
  return {headline:analysis.score>=81?"这单，谁来安慰一下？":analysis.score<=20?"这单是不是赚到了？":"这价格，朋友怎么看？",caption:"价格位置：第 "+analysis.score+" 百分位",badge:"冤种指数 "+analysis.score+" · "+analysis.title,evidence,system:""};
 }
@@ -64,15 +64,17 @@ function drawCard(ctx,post,analysis,options={},image){
  }
  line(ctx,options.hideCity?"消费后的一点小情绪":String(post.city||"")+" · "+(post.priceType==="paid"?"实际支付":"看到的报价"),56,620,24,t.muted);
  if(!options.hideCity&&(post.placeName||post.scene))line(ctx,[post.placeName,post.scene].filter(Boolean).join(" · "),56,644,18,t.muted);
- const high=validAnalysis(analysis)&&analysis.score>=81&&(!post.mood||post.mood==="neutral");
- ctx.fillStyle=high?"#ffe1dc":t.accent;ctx.fillRect(56,651,608,66);
- line(ctx,copy.badge,76,696,30,high?"#a83d38":t.badgeInk,568,"bold");
- line(ctx,copy.headline,56,785,38,t.ink,608,"bold");
- line(ctx,copy.caption,56,838,30,t.ink);
- if(copy.system)line(ctx,copy.system,56,883,23,t.muted);
- line(ctx,copy.evidence,56,928,22,t.muted);
- line(ctx,"趣味参考，不代表商家评价。照片仅做裁切与亮度调整。",56,965,18,t.muted);
- line(ctx,"你觉得这个价格冤不冤？",56,1023,23,t.ink);
+ const feeling=post.mood==="won"||post.mood==="ripped";
+ const high=validAnalysis(analysis)&&analysis.score>=81&&!feeling;
+ if(!feeling){ctx.fillStyle=high?"#ffe1dc":t.accent;ctx.fillRect(56,651,608,66);line(ctx,copy.badge,76,696,30,high?"#a83d38":t.badgeInk,568,"bold")}
+ line(ctx,copy.headline,56,feeling?735:785,38,t.ink,608,"bold");
+ line(ctx,copy.caption,56,feeling?795:838,feeling?36:30,t.ink,608,feeling?"bold":"normal");
+ if(validAnalysis(analysis)){
+  if(copy.system)line(ctx,copy.system,56,878,25,t.muted);
+  line(ctx,copy.evidence,56,925,21,t.muted);
+ }else{line(ctx,"个人消费感受 · 暂无足够可比样本评分",56,945,20,t.muted)}
+ const question=post.mood==="won"?"你们那边，这些得多少钱？":post.mood==="ripped"?"你们说，这单冤不冤？":"你觉得这个价格冤不冤？";
+ line(ctx,question,56,1018,27,t.ink);
  return copy;
 }
 module.exports={WIDTH,HEIGHT,THEMES,cropRect,brighten,validAnalysis,cardCopy,drawCard};

@@ -44,5 +44,10 @@ test("full-photo option uses image without source cropping",()=>{
 test("user feeling is independent of numeric result and works without samples",()=>{
  const analysis={status:"ready",score:92,title:"大冤种",count:12};const before=JSON.stringify(analysis);
  const won=cardCopy({mood:"won"},analysis);assert.equal(won.caption,"感觉赚大了！");assert.ok(won.badge.includes("我的感受"));assert.ok(won.system.includes("92"));assert.ok(won.system.includes("大冤种"));assert.equal(JSON.stringify(analysis),before);
- const unknown=cardCopy({mood:"ripped"},null);assert.equal(unknown.caption,"我是不是大冤种？");assert.equal(unknown.system,"个人感受，等朋友来评理。");assert.ok(unknown.evidence.includes("暂不评分"));
+ const unknown=cardCopy({mood:"ripped"},null);assert.equal(unknown.caption,"我是不是大冤种？");assert.equal(unknown.system,"");assert.ok(unknown.evidence.includes("暂不评分"));
+});
+
+test("feeling card keeps one small note without duplicate banners or disclaimers",()=>{
+ const ctx=context();drawCard(ctx,{name:"涮牛肉",city:"南京·浦口区",price:140,mood:"won"},null,{},null);const texts=ctx.texts.map(t=>t.text);
+ assert.ok(texts.includes("这么多才这个价"));assert.ok(texts.includes("感觉赚大了！"));assert.ok(texts.includes("你们那边，这些得多少钱？"));assert.equal(texts.some(t=>t.includes("我的感受")),false);assert.equal(texts.some(t=>t.includes("趣味参考")),false);assert.equal(texts.filter(t=>t.includes("评分")).length,1);
 });
