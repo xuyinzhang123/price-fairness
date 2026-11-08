@@ -1,7 +1,7 @@
 const store=require("../../utils/store");const api=require("../../utils/api");
 Page({data:{region:[],items:[],cloud:false,error:"",city:"",name:"",loading:false,searched:false},
 onShow(){if(!this.data.city&&wx.getStorageSync)this.setData({city:wx.getStorageSync("price-fairness-city")||""});return this.search()},
-cityChange(e){const value=e.detail.value;const region=Array.isArray(value)?value:[];let city=region.length?(region[1]==="市辖区"||region[1]==="县"?region[0]:region[1]):value;city=(city||"").replace(/市$/,"");this.setData({city,region});wx.setStorageSync("price-fairness-city",city)},
+cityChange(e){const value=e.detail.value;const region=Array.isArray(value)?value:[];let city=region.length?(region[1]==="市辖区"||region[1]==="县"?region[0]:region[1]):value;city=city||"";if(!city.includes("·"))city=city.replace(/市$/,"");this.setData({city,region});wx.setStorageSync("price-fairness-city",city)},
 nameChange(e){this.setData({name:e.detail.value})},
 async search(){
  const city=this.data.city.trim(),name=this.data.name.trim(),requestId=(this.requestId||0)+1;this.requestId=requestId;

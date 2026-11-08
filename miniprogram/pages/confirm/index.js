@@ -13,7 +13,7 @@ async onLoad(q){
 },
 noop(){},closePlace(){this.setData({showPlace:false})},togglePlace(){this.setData({showPlace:!this.data.showPlace})},sceneChange(e){const value=e.currentTarget.dataset.scene;this.setData({scene:this.data.scene===value?"":value})},
 change(e){this.setData({[e.currentTarget.dataset.field]:e.detail.value})},
-cityChange(e){const value=e.detail.value;const region=Array.isArray(value)?value:[];let city=region.length?(region[1]==="市辖区"||region[1]==="县"?region[0]:region[1]):value;city=(city||"").replace(/市$/,"");this.setData({city,region});wx.setStorageSync("price-fairness-city",city)},
+cityChange(e){const value=e.detail.value;const region=Array.isArray(value)?value:[];let city=region.length?(region[1]==="市辖区"||region[1]==="县"?region[0]:region[1]):value;city=city||"";if(!city.includes("·"))city=city.replace(/市$/,"");this.setData({city,region});wx.setStorageSync("price-fairness-city",city)},
 paidChange(e){this.setData({paid:e.detail.value})},
 submit(){const d=this.data;const price=Number(d.price);
 if(!d.name.trim()||!d.city.trim()||!Number.isFinite(price)||price<0.01||price>1000000){wx.showToast({title:"请填写名称、有效价格和城市",icon:"none"});return}

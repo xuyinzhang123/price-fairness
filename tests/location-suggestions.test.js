@@ -1,0 +1,3 @@
+const {test}=require('node:test'),assert=require('node:assert/strict');const {suggestLocations}=require('../miniprogram/utils/location-suggestions');
+test('county and district names have contextual suggestions',()=>{assert.ok(suggestLocations('德清').some(r=>r.value==='湖州·德清县'));assert.ok(suggestLocations('黄浦').some(r=>r.value==='上海·黄浦区'))});
+test('city suggestions prioritize exact city and allow arbitrary text with no results',()=>{assert.equal(suggestLocations('湖州')[0].value,'湖州');assert.equal(suggestLocations('上海')[0].value,'上海');assert.equal(suggestLocations('某个新地点').length,0);assert.equal(suggestLocations('').length,0)});

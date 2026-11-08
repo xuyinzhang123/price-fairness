@@ -1,0 +1,2 @@
+<view class="location-box"><input value="{{value}}" placeholder="{{placeholder}}" maxlength="80" bindinput="input" bindfocus="focus" bindblur="blur" bindconfirm="confirm" confirm-type="done"/>
+<view wx:if="{{open&&value}}" class="suggestions"><view wx:for="{{suggestions}}" wx:key="value" class="option" data-value="{{item.value}}" catchtap="pick"><text>{{item.value}}</text><text class="area-label">{{item.label}}</text></view><view class="option custom" data-value="{{value}}" catchtap="pick">直接使用“{{value}}”</view></view></view>
