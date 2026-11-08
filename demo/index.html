@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fbf8f4"><meta name="description" content="冤种指数网页演示：晒个价格，做张消费卡片，让朋友评评理。无需登录，不上传照片。"><title>冤种指数 · 晒一单，评评理</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><a class="brand" href="#" aria-label="返回首页"><span class="brand-mark">¥?</span>冤种指数<span class="demo-tag">DEMO</span></a><a class="github" href="https://github.com/xuyinzhang123/price-fairness" target="_blank" rel="noopener">GitHub ↗</a></header>
+<main>
+<section class="intro"><div class="eyebrow">AFTER THE BILL. BEFORE THE REGRET.</div><div class="stamp" aria-hidden="true">¥<span>?</span></div><h1>钱都花了，<br>这价格<span>冤不冤？</span></h1><p>一杯咖啡，一碗炒饭，一晚酒店。<br>晒出你的价格，让朋友评评理。</p><div class="intro-note"><span class="dot"></span> 不用注册，先玩一单。</div><div class="tiny">开源项目 / 微信小程序的浏览器体验版</div></section>
+<section class="playground" aria-label="小程序交互演示">
+<div class="panel-top"><span>PRICE FAIRNESS</span><span class="local-indicator">仅保存在本机</span></div>
+<ol class="steps"><li data-step="home">01 晒消费</li><li data-step="form">02 确认一下</li><li data-step="result">03 看卡片</li></ol>
+<div id="home" class="screen">
+<div class="section-label">你的消费，也值得留一笔。</div><h2>来，晒一单。</h2><p class="muted">拍张照片或选一张图，剩下的很简单。</p>
+<label class="upload-box" for="photo"><span class="upload-icon">＋</span><strong>选张照片，看看冤不冤</strong><span>照片留在你的设备，不上传服务器</span></label><input type="file" id="photo" accept="image/*" hidden>
+<div class="or"><span></span> 或者，用一笔示例体验 <span></span></div>
+<div class="examples"><button data-example="rice"><span>🍚</span><strong>一份蛋炒饭</strong><small>成都 · ¥28</small></button><button data-example="coffee"><span>☕</span><strong>一杯拿铁</strong><small>上海 · ¥36</small></button><button data-example="hotel"><span>🛏️</span><strong>一晚酒店</strong><small>湖州 · ¥303</small></button></div>
+<button id="manual" class="text-button">不选照片，直接填价格 →</button>
+</div>
+<div id="form" class="screen" hidden><button class="back" data-back="home">← 返回</button><h2>确认一下。</h2><p class="muted">花了多少，你最清楚。</p><div id="photo-preview" class="photo-preview" hidden></div>
+<form id="price-form"><label>商品或服务名称<input id="item-name" maxlength="80" placeholder="例如：蛋炒饭、酒店大床房" required></label><div class="form-row"><label>价格 / 元<input id="price" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" placeholder="28.00" required></label><label>城市<select id="city"><option value="成都">成都</option><option value="上海">上海</option><option value="湖州">湖州</option><option value="北京">北京</option><option value="广州">广州</option><option value="深圳">深圳</option><option value="杭州">杭州</option><option value="其他">其他城市</option></select></label></div><label id="other-city-label" hidden>城市名称<input id="other-city" maxlength="40" placeholder="填写消费发生的城市"></label>
+<details><summary>店铺、位置和备注 <span>选填 ＋</span></summary><label>店铺或摊位<input id="place" maxlength="100" placeholder="给下次留个线索"></label><label>补充说明<input id="note" maxlength="160" placeholder="例如：会员券后、普通一份"></label></details><button class="primary" type="submit">生成我的消费卡片 ↗</button></form></div>
+<div id="result" class="screen" hidden><div class="result-tools"><button class="back" data-back="form">← 改一下</button><span class="demo-tag">演示结果</span></div><div id="card-area"><canvas id="card" width="720" height="1080" aria-label="生成的消费分享卡片"></canvas></div><div class="themes" aria-label="卡片样式"><button data-theme="receipt" class="selected">简洁账单</button><button data-theme="playful">趣味吐槽</button><button data-theme="magazine">杂志封面</button></div><button id="download" class="primary">保存卡片，找朋友评理 ↓</button><p class="micro">保存图片后可自行发送；演示卡片不含小程序码。</p>
+<div class="reference-head"><h3>看看别人花了多少</h3><span id="sample-count"></span></div><p id="reference-note" class="micro"></p><div id="references"></div>
+<details id="reply-details"><summary>我也报个价 <span>＋</span></summary><form id="reply-form"><div class="form-row"><label>同城同项价格 / 元<input id="reply-price" type="number" inputmode="decimal" min="0.01" max="1000000" step="0.01" required></label><label>店铺（选填）<input id="reply-place" maxlength="100" placeholder="在哪里消费的"></label></div><button type="submit" class="secondary">补充到本机演示</button></form></details><button id="restart" class="text-button">再晒一单 →</button></div>
+<div class="panel-bottom">演示数据不代表真实市场价格 · AI 识图与搜索尚未启用</div>
+</section></main>
+<footer><span>真实价格，慢慢积累。</span><div><button id="clear-data">清除本机演示记录</button><a href="https://github.com/xuyinzhang123/price-fairness/issues" target="_blank" rel="noopener">一起改进 ↗</a></div></footer><div id="toast" role="status" aria-live="polite"></div><script src="poster.js"></script><script src="app.js"></script>
+</body></html>
