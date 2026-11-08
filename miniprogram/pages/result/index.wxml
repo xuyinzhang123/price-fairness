@@ -20,7 +20,7 @@
    <block wx:if="{{showReferences}}">
     <view>本次有效参考 {{analysis?analysis.count:0}} 条</view>
     <view wx:if="{{analysis.status==='ready'}}" class="notice">参考中位价 ¥{{analysis.median}} · 近 {{analysis.windowDays}} 天<br/>指数表示本次同城样本中的价格位置。</view>
-    <view wx:else class="notice">还没有足够的可比报价，不硬给分数。朋友仍可以投票、留言和补价。</view>
+    <view wx:else class="notice">{{analysis.message||"还没有足够的可比报价，欢迎留言和补价。"}}</view>
     <view wx:for="{{analysis.references}}" wx:key="id"><view class="divider"/><view class="row"><text>{{item.source==='web'?'公开报价':'用户报价'}}</text><text>¥{{item.price}}</text></view><view class="place-line">{{item.placeName||"店名未提供"}} · {{item.scene||"场景未提供"}}<br/>{{item.locationHint}}</view><view class="notice">{{item.observedAt}}</view><text wx:if="{{item.url}}" selectable class="notice">{{item.url}}</text></view>
    </block>
    <block wx:else><view class="row"><text>也让同城的人评评理</text><switch color="#7047eb" checked="{{cityVisible}}" disabled="{{published}}" bindchange="visibilityChange"/></view><view class="notice">默认不进入同城列表，生成评理帖时保存此选择。</view></block>

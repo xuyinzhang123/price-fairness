@@ -28,3 +28,11 @@ test('cloud upload references must belong to current caller and environment',asy
  const result=await call({path:'/api/posts',data:{...quote,imageFileId:fileID}});assert.ok(result.post);assert.equal([...data.price_posts.values()][0].image,fileID);
  const forged=await call({path:'/api/posts',data:{...quote,imageFileId:'cloud://cloud1-example.bucket/prices/someone-else/photo.jpg'}});assert.ok(forged.error);assert.equal(data.price_posts.size,1);
 });
+
+test('cloud analysis reads public posts and replies but excludes private thread replies',async()=>{
+ const {call,data}=handler();const now=new Date().toISOString();
+ for(let i=0;i<5;i++)data.price_posts.set('public-'+i,{_id:'public-'+i,owner:'other-'+i,name:'蛋炒饭',city:'湖州',price:10+i*2,priceType:'paid',scene:'',observedAt:now,createdAt:now,cityVisible:true});
+ data.price_posts.set('private',{_id:'private',owner:'hidden',name:'蛋炒饭',city:'湖州',price:1,priceType:'paid',scene:'',observedAt:now,createdAt:now,cityVisible:false});
+ data.price_replies.set('private-reply',{_id:'private-reply',postId:'private',owner:'hidden-reply',name:'蛋炒饭',city:'湖州',price:1,priceType:'paid',scene:'',observedAt:now});
+ const a=await call({path:'/api/analyze',data:{name:'蛋炒饭',city:'湖州',price:28,priceType:'paid'}});assert.equal(a.status,'ready');assert.equal(a.score,100);assert.equal(a.title,'大冤种');assert.equal(a.count,5);assert.equal(a.references.some(r=>r.id==='private-reply'),false);
+});

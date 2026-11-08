@@ -1,4 +1,5 @@
 const deployment=require("./deployment.json");
+const {buildUserAnalysis}=require('./user-analysis');
 const cloud=require('wx-server-sdk');
 const {randomUUID,createHash}=require('crypto');
 const {quoteInput,text,price}=require('./validation');
@@ -17,7 +18,14 @@ exports.main=async(event)=>{
  if(route.pathname==='/api/health')return {status:'ok',capabilities:{recognition:false,search:false}};
  if(route.pathname==='/api/upload-target'&&method==='POST'){const ownerKey=createHash('sha256').update(OPENID).digest('hex');return {cloudPath:'prices/'+ownerKey+'/'+randomUUID()+'.jpg'};}
  if(route.pathname==='/api/recognize')return {status:'unconfigured'};
- if(route.pathname==='/api/analyze'){text(body.name,'名称');text(body.city,'城市');price(body.price);return {status:'insufficient',count:0,references:[],searchStatus:'disabled',windowDays:90};}
+ if(route.pathname==='/api/analyze'){
+ const subject={name:text(body.name,'名称'),city:text(body.city,'城市'),price:price(body.price),priceType:body.priceType==='seen'?'seen':'paid',scene:typeof body.scene==='string'?body.scene:'',excludeId:typeof body.excludeId==='string'?body.excludeId:''};
+ const [p,r]=await Promise.all([posts.where({name:subject.name,city:subject.city,cityVisible:true}).limit(100).get(),replies.where({name:subject.name,city:subject.city}).limit(100).get()]);
+ const publicIds=new Set(p.data.map(q=>q._id));let original=null;if(subject.excludeId)original=await getPost(subject.excludeId);
+ if(original){subject.priceType=original.priceType;subject.scene=original.scene||'';}
+ const candidates=[...p.data,...r.data.filter(q=>publicIds.has(q.postId))];
+ return buildUserAnalysis(subject,candidates,{viewer:OPENID,subjectOwner:original&&original.owner,truncated:p.data.length===100||r.data.length===100});
+ }
  if(route.pathname==='/api/mine'&&method==='GET')return {count:(await posts.where({owner:OPENID}).count()).total};
  if(route.pathname==='/api/posts'&&method==='GET'){
  const city=text(route.searchParams.get('city'),'城市'),name=(route.searchParams.get('name')||'').trim();

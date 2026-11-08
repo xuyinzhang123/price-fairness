@@ -1,8 +1,8 @@
 const TITLES = [
-  { max: 20, title: "低价段" },
-  { max: 40, title: "偏低价" },
-  { max: 60, title: "中间价" },
-  { max: 80, title: "偏高价" },
+  { max: 20, title: "赚到了" },
+  { max: 40, title: "会过日子" },
+  { max: 60, title: "正常发挥" },
+  { max: 80, title: "有点小贵" },
   { max: 100, title: "大冤种" }
 ];
 function scorePrice(current, samples) {

@@ -14,7 +14,7 @@ async load(){
   if(!post)throw new Error("这条晒价不存在");
   this.setData({post:{...post,image:api.imageUrl(post.image)},reactions:post.reactions||{normal:0,expensive:0,cheap:0},loading:false});
   if(api.enabled()){
-   try{const analysis=await api.request("/api/analyze",{name:post.name,city:post.city,price:post.price,excludeId:post.quoteId});
+   try{const analysis=await api.request("/api/analyze",{name:post.name,city:post.city,price:post.price,priceType:post.priceType,scene:post.scene,excludeId:post.quoteId});
     this.setData({analysis})}catch(_){this.setData({analysis:null})}
   }
  }catch(e){this.setData({error:e.message,loading:false})}

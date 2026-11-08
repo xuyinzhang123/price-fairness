@@ -21,7 +21,7 @@ function validAnalysis(a){
 function cardCopy(post,analysis){
  if(!validAnalysis(analysis))return {headline:"冤不冤暂时不知道",caption:"先让朋友评评理。",badge:"等待朋友评理",evidence:"参考样本不足或分析未完成，暂不评分。"};
  return {headline:analysis.score>=81?"这单，谁来安慰一下？":analysis.score<=20?"这单是不是赚到了？":"这价格，朋友怎么看？",
-  caption:"钱都花了，来评评理。",badge:"冤种指数 "+analysis.score+" / 100",
+  caption:"价格位置：第 "+analysis.score+" 百分位",badge:"冤种指数 "+analysis.score+" · "+analysis.title,
   evidence:"同城参考 "+analysis.count+" 条 · 近 "+(analysis.windowDays||90)+" 天"+(analysis.limited?" · 样本较少":"")};
 }
 function fitLine(ctx,value,width){
